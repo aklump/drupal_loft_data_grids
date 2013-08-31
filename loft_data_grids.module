@@ -188,10 +188,82 @@ function loft_data_grids_libraries_info() {
     ),
     'files' => array(
       'php' => array(
-        'classes/export.php',
+        'classes/ExportData.php',
+        'classes/Exporter.php',
+        'classes/HTMLExporter.php',
       ),
     ),
   );
 
   return $libraries;
+}
+
+/**
+ * Return info about the export formats available
+ *
+ * @param type $string
+ *   description
+ *
+ * @return array
+ *   tbd
+ */
+function loft_data_grids_export_info() {
+  $info = &drupal_static(__FUNCTION__, array());
+  if (empty($info)) {
+    libraries_load('loft_data_grids');
+    $info = array();
+    $data = new ExportData();
+    $classes = array(
+      new CSVExporter($data),
+      new XLSXExporter($data),
+      new FlatTextExporter($data),
+      new XMLExporter($data),
+      new JSONExporter($data),
+      new YAMLExporter($data),
+    );
+    foreach ($classes as $object) {
+      $class = get_class($object);
+      $info[$class] = array(
+        'id' => $class,
+      ) + $object->getInfo();
+    }
+    drupal_alter('loft_data_grids_export_info', $info);
+  }
+
+  return $info;
+}
+
+/**
+ * Instantiate a new ExportData object
+ *
+ * @param mixed $page_id
+ *   (Optional) Defaults to 0.
+ */
+function loft_data_grids_export_data($page_id = 0, $class = 'ExportData') {
+  libraries_load('loft_data_grids');
+
+  if (class_exists($class)) {
+    return new $class($page_id);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Instantiate a new ExportData object
+ *
+ * @param ExportDataInterface $data
+ * @param string $class
+ *   The name of any of the various Exporter classes
+ * @param string $filename
+ *   (Optional) Defaults to ''.
+ */
+function loft_data_grids_exporter(ExportDataInterface $data, $class, $filename = '') {
+  libraries_load('loft_data_grids');
+
+  if (class_exists($class)) {
+    return new $class($data, $filename);
+  }
+
+  return FALSE;
 }

@@ -20,7 +20,7 @@ function loft_data_grids_requirements($phase) {
   $reqs = array();
   $t = get_t();
   if ($phase == 'runtime') {
-    $info = libraries_detect('loft_data_grids');
+    $info = libraries_load('loft_data_grids');
     $reqs['loft_data_grids'] = array(
       'title' => check_plain($info['name']),
       'value' => check_plain($info['version']),
@@ -30,9 +30,13 @@ function loft_data_grids_requirements($phase) {
       'severity' => REQUIREMENT_OK,
       );
     if (!$info['installed']) {
-      $reqs['loft_data_grids']['title'] = $t('Loft Data Grids');
       $reqs['loft_data_grids']['value'] = $t('Not Found!');
       $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids library is missing; see README for installation instructions.');
+      $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
+    }
+    if (!$info['loaded']) {
+      $reqs['loft_data_grids']['value'] = $t('Not Loaded!');
+      $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids library was found but not loaded; see README for installation instructions.');
       $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
     }
   }
