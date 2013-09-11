@@ -215,6 +215,7 @@ function loft_data_grids_export_info() {
     $data = new ExportData();
     $classes = array(
       new CSVExporter($data),
+      new TabTextExporter($data),
       new XLSXExporter($data),
       new FlatTextExporter($data),
       new XMLExporter($data),
