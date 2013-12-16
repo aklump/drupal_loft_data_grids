@@ -19,8 +19,10 @@
 function loft_data_grids_requirements($phase) {
   $reqs = array();
   $t = get_t();
-  $info = libraries_load('loft_data_grids');
-  if ($phase === 'update' && !$info['loaded']) {
+  if ($info = libraries_detect('loft_data_grids')) {
+    $info = libraries_load('loft_data_grids');
+  }
+  if ($phase === 'update' && empty($info['loaded'])) {
     $reqs['loft_data_grids'] = array(
       'title' => check_plain($info['name']),
       'value' => $t('Not Found!'),
@@ -29,7 +31,12 @@ function loft_data_grids_requirements($phase) {
     );
   }
   elseif ($phase == 'runtime') {
-
+    if (empty($info)) {
+      $info = array(
+        'name' => 'Loft Data Grids',
+        'version' => '',
+      );
+    }
     $reqs['loft_data_grids'] = array(
       'title' => check_plain($info['name']),
       'value' => check_plain($info['version']),
@@ -38,19 +45,20 @@ function loft_data_grids_requirements($phase) {
       )),
       'severity' => REQUIREMENT_OK,
     );
-    if (!$info['installed']) {
+    if (empty($info['installed'])) {
       $reqs['loft_data_grids']['value'] = $t('Not Found!');
       $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids library is missing; see README for installation instructions.');
       $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
     }
-    if (!$info['loaded']) {
+    elseif (empty($info['loaded'])) {
       $reqs['loft_data_grids']['value'] = $t('Not Loaded!');
       $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids library was found but not loaded; see README for installation instructions.');
       $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
     }
 
     $exporters = loft_data_grids_export_info();
-    if (($missing = array_diff(_loft_data_get_possible_exporters(), array_keys($exporters)))) {
+    if ($reqs['loft_data_grids']['severity'] === REQUIREMENT_OK
+        && ($missing = array_diff(_loft_data_get_possible_exporters(), array_keys($exporters)))) {
       $reqs['loft_data_grids']['description'] .= $t(' However, the following Exporters have unmet dependencies and are not available: @list.', array(
         '@list' => implode(', ', $missing),
       ));

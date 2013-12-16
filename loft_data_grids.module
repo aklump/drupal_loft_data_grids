@@ -193,6 +193,13 @@ function loft_data_grids_libraries_info() {
         'classes/HTMLExporter.php',
       ),
     ),
+    'callbacks' => array(
+      'info' => array(),
+      'pre-detect' => array(),
+      'post-detect' => array(),
+      'pre-load' => array(),
+      'post-load' => array(),
+    ),
   );
 
   return $libraries;
@@ -204,7 +211,7 @@ function loft_data_grids_libraries_info() {
  * @return array
  */
 function _loft_data_get_possible_exporters() {
-  return array(
+  $classes = array(
     'CSVExporter',
     'TabTextExporter',
     'XLSXExporter',
@@ -212,7 +219,16 @@ function _loft_data_get_possible_exporters() {
     'XMLExporter',
     'JSONExporter',
     'YAMLExporter',
+    'TextListExporter',
+    'MarkdownExporter',
   );
+  foreach ($classes as $key => $class) {
+    if (!class_exists($class)) {
+      unset($classes[$key]);
+    }
+  }
+
+  return $classes;
 }
 
 /**
