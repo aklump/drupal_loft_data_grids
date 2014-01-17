@@ -8,227 +8,18 @@
  */
 
 /**
- * Return information about external libraries.
- *
- * @return
- *   An associative array whose keys are internal names of libraries and whose
- *   values are describing each library. Each key is the directory name below
- *   the 'libraries' directory, in which the library may be found. Each value is
- *   an associative array containing:
- *   - name: The official, human-readable name of the library.
- *   - vendor url: The URL of the homepage of the library.
- *   - download url: The URL of a web page on which the library can be obtained.
- *   - path: (optional) A relative path from the directory of the library to the
- *     actual library. Only required if the extracted download package contains
- *     the actual library files in a sub-directory.
- *   - library path: (optional) The absolute path to the library directory. This
- *     should not be declared normally, as it is automatically detected, to
- *     allow for multiple possible library locations. A valid use-case is an
- *     external library, in which case the full URL to the library should be
- *     specified here.
- *   - version: (optional) The version of the library. This should not be
- *     declared normally, as it is automatically detected (see 'version
- *     callback' below) to allow for version changes of libraries without code
- *     changes of implementing modules and to support different versions of a
- *     library simultaneously (though only one version can be installed per
- *     site). A valid use-case is an external library whose version cannot be
- *     determined programatically.
- *   - version callback: (optional) The name of a function that detects and
- *     returns the full version string of the library. The first argument is
- *     always $library, an array containing all library information as described
- *     here. There are two ways to declare the version callback's additional
- *     arguments, either as a single $options parameter or as multiple
- *     parameters, which correspond to the two ways to specify the argument
- *     values (see 'version arguments'). Defaults to libraries_get_version().
- *   - version arguments: A list of arguments to pass to the version callback.
- *     Version arguments can be declared either as an associative array whose
- *     keys are the argument names or as an indexed array without specifying
- *     keys. If declared as an associative array, the arguments get passed to
- *     the version callback as a single $options parameter whose keys are the
- *     argument names (i.e. $options is identical to the specified array). If
- *     declared as an indexed array, the array values get passed to the version
- *     callback as seperate arguments in the order they were declared. The
- *     default version callback libraries_get_version() expects a single,
- *     associative array with named keys:
- *     - file: The filename to parse for the version, relative to the library
- *       path. For example: 'docs/changelog.txt'.
- *     - pattern: A string containing a regular expression (PCRE) to match the
- *       library version. For example: '@version\s+([0-9a-zA-Z\.-]+)@'. Note
- *       that the returned version is not the match of the entire pattern (i.e.
- *       '@version 1.2.3' in the above example) but the match of the first
- *       sub-pattern (i.e. '1.2.3' in the above example).
- *     - lines: (optional) The maximum number of lines to search the pattern in.
- *       Defaults to 20.
- *     - cols: (optional) The maximum number of characters per line to take into
- *       account. Defaults to 200. In case of minified or compressed files, this
- *       prevents reading the entire file into memory.
- *   - files: An associative array of library files to load. Supported keys are:
- *     - js: A list of JavaScript files to load, using the same syntax as Drupal
- *       core's hook_library().
- *     - css: A list of CSS files to load, using the same syntax as Drupal
- *       core's hook_library().
- *     - php: A list of PHP files to load.
- *   - dependencies: An array of libraries this library depends on. Similar to
- *     declaring module dependencies, the dependency declaration may contain
- *     information on the supported version. Examples of supported declarations:
- *     @code
- *     $libraries['dependencies'] = array(
- *       // Load the 'example' library, regardless of the version available:
- *       'example',
- *       // Only load the 'example' library, if version 1.2 is available:
- *       'example (1.2)',
- *       // Only load a version later than 1.3-beta2 of the 'example' library:
- *       'example (>1.3-beta2)'
- *       // Only load a version equal to or later than 1.3-beta3:
- *       'example (>=1.3-beta3)',
- *       // Only load a version earlier than 1.5:
- *       'example (<1.5)',
- *       // Only load a version equal to or earlier than 1.4:
- *       'example (<=1.4)',
- *       // Combinations of the above are allowed as well:
- *       'example (>=1.3-beta2, <1.5)',
- *     );
- *     @endcode
- *   - variants: (optional) An associative array of available library variants.
- *     For example, the top-level 'files' property may refer to a default
- *     variant that is compressed. If the library also ships with a minified and
- *     uncompressed/source variant, those can be defined here. Each key should
- *     describe the variant type, e.g. 'minified' or 'source'. Each value is an
- *     associative array of top-level properties that are entirely overridden by
- *     the variant, most often just 'files'. Additionally, each variant can
- *     contain following properties:
- *     - variant callback: (optional) The name of a function that detects the
- *       variant and returns TRUE or FALSE, depending on whether the variant is
- *       available or not. The first argument is always $library, an array
- *       containing all library information as described here. The second
- *       argument is always a string containing the variant name. There are two
- *       ways to declare the variant callback's additinal arguments, either as a
- *       single $options parameter or as multiple parameters, which correspond
- *       to the two ways to specify the argument values (see 'variant
- *       arguments'). If ommitted, the variant is expected to always be
- *       available.
- *     - variant arguments: A list of arguments to pass to the variant callback.
- *       Variant arguments can be declared either as an associative array whose
- *       keys are the argument names or as an indexed array without specifying
- *       keys. If declared as an associative array, the arguments get passed to
- *       the variant callback as a single $options parameter whose keys are the
- *       argument names (i.e. $options is identical to the specified array). If
- *       declared as an indexed array, the array values get passed to the
- *       variant callback as seperate arguments in the order they were declared.
- *     Variants can be version-specific (see 'versions').
- *   - versions: (optional) An associative array of supported library versions.
- *     Naturally, libraries evolve over time and so do their APIs. In case a
- *     library changes between versions, different 'files' may need to be
- *     loaded, different 'variants' may become available, or Drupal modules need
- *     to load different integration files adapted to the new version. Each key
- *     is a version *string* (PHP does not support floats as keys). Each value
- *     is an associative array of top-level properties that are entirely
- *     overridden by the version.
- *   - integration files: (optional) An associative array whose keys are module
- *     names and whose values are sets of files to load for the module, using
- *     the same notion as the top-level 'files' property. Each specified file
- *     should contain the path to the file relative to the module it belongs to.
- *   - callbacks: An associative array whose keys are callback groups and whose
- *     values are arrays of callbacks to apply to the library in that group.
- *     Each callback receives the following arguments:
- *     - $library: An array of library information belonging to the top-level
- *       library, a specific version, a specific variant or a specific variant
- *       of a specific version. Because library information such as the 'files'
- *       property (see above) can be declared in all these different locations
- *       of the library array, but a callback may have to act on all these
- *       different parts of the library, it is called recursively for each
- *       library with a certain part of the libraries array passed as $library
- *       each time.
- *     - $version: If the $library array belongs to a certain version (see
- *       above), a string containing the version. This argument may be empty, so
- *       NULL should be specified as the default value.
- *     - $variant: If the $library array belongs to a certain variant (see
- *       above), a string containing the variant name. This argument may be
- *       empty, so NULL should be specified as the default value.
- *     Valid callback groups are:
- *     - info: Callbacks registered in this group are applied after the library
- *       information has been retrieved via hook_libraries_info() or info files.
- *     - pre-detect: Callbacks registered in this group are applied after the
- *       library path has been determined and before the version callback is
- *       invoked. At this point the following additional information is available:
- *       - $library['library path']: The path on the file system to the library.
- *     - post-detect: Callbacks registered in this group are applied after the
- *       library has been successfully detected. At this point the library
- *       contains the version-specific information, if specified, and following
- *       additional information is available:
- *       - $library['installed']: A boolean indicating whether the library is
- *         installed or not.
- *       - $library['version']: If it could be detected, a string containing the
- *         version of the library.
- *       - $library['variants'][$variant]['installed']: For each specified
- *         variant, a boolean indicating whether the variant is installed or
- *         not.
- *       Note that in this group the 'versions' property is no longer available.
- *     - pre-load: Callbacks registered in this group are applied directly
- *       before this library is loaded. At this point the library contains
- *       variant-specific information, if specified. Note that in this group the
- *       'variants' property is no longer available.
- *     - post-load: Callbacks registered in this group are applied directly
- *       after this library is loaded. At this point, the library contains a
- *       'loaded' key, which contains the number of files that were loaded.
- *   Additional top-level properties can be registered as needed.
- *
- * @see hook_library()
+ * Implements hook_permission().
  */
-function loft_data_grids_libraries_info() {
-  // Expected to be extracted into 'sites/all/libraries/loft_data_grids'.
-  $libraries['loft_data_grids'] = array(
-    'name' => 'Loft Data Grids',
-    'vendor url' => 'http://www.intheloftstudios.com',
-    'download url' => 'https://github.com/aklump/loft_data_grids',
-    'version arguments' => array(
-      'file' => 'loft_data_grids.info',
-      'pattern' => '/version ?= ?([\d.]+)/',
-      'lines' => 3,
-    ),
-    'files' => array(
-      'php' => array(
-        'classes/ExportData.php',
-        'classes/Exporter.php',
-        'classes/HTMLExporter.php',
-      ),
-    ),
-    'callbacks' => array(
-      'info' => array(),
-      'pre-detect' => array(),
-      'post-detect' => array(),
-      'pre-load' => array(),
-      'post-load' => array(),
-    ),
-  );
-
-  return $libraries;
-}
-
-/**
- * Return an array of all possible Exporter classnames
- *
- * @return array
- */
-function _loft_data_get_possible_exporters() {
-  $classes = array(
-    'CSVExporter',
-    'TabTextExporter',
-    'XLSXExporter',
-    'FlatTextExporter',
-    'XMLExporter',
-    'JSONExporter',
-    'YAMLExporter',
-    'TextListExporter',
-    'MarkdownExporter',
-  );
-  foreach ($classes as $key => $class) {
-    if (!class_exists($class)) {
-      unset($classes[$key]);
-    }
+function loft_data_grids_permission() {
+  $perms = array();
+  foreach (loft_data_grids_export_info() as $data) {
+    $perms['loft_data_grids:' . $data['id']] = array(
+     'title' => t('Visible in UI: @id', array('@id' => $data['name'])),
+     'description' => check_plain($data['description']),
+    );
   }
 
-  return $classes;
+  return $perms;
 }
 
 /**
@@ -238,34 +29,146 @@ function _loft_data_get_possible_exporters() {
  *   description
  *
  * @return array
- *   tbd
+ *   - path
+ *   - loaded
+ *   - name
+ *   - description
+ *   - version
+ *   - author
+ *   - installed
  */
-function loft_data_grids_export_info() {
+function loft_data_grids_info() {
   $info = &drupal_static(__FUNCTION__, array());
-  if (empty($info)
-      && ($library = libraries_load('loft_data_grids'))
-      && $library['loaded']) {
+  if (empty($info)) {
+    $info = array(
+      'path' => drupal_get_path('module', 'loft_data_grids') . '/vendor/aklump/loft_data_grids', 
+    );
 
-    if (module_exists('phpexcel')) {
-      libraries_load('PHPExcel');
+    $info_file = $info['path'] . '/loft_data_grids.info';
+    if (($info['loaded'] = file_exists($info_file))
+      && ($parsed = parse_ini_file($info_file))) {
+      $parsed['installed'] = TRUE;
+      $info += $parsed;
     }
 
-    $info = array();
-    $data = new ExportData();
-    $classnames = _loft_data_get_possible_exporters();
-    $classes = array();
-    foreach ($classnames as $classname) {
-      $object = loft_data_grids_exporter($data, $classname);
-      if ($object->dependencies) {
-        $info[$classname] = array(
-          'id' => $classname,
-        ) + $object->getInfo();
-      }
-    }
-    drupal_alter('loft_data_grids_export_info', $info);
+    $info += array(
+      'name' => pathinfo(__FILE__, PATHINFO_FILENAME), 
+      'version' => '', 
+      'installed' => FALSE,
+    );
   }
 
   return $info;
+}
+
+/**
+ * Return an array of Exporter classnames dynamically loaded and cached
+ *
+ * @return array
+ */
+function _loft_data_grids_get_exporter_names() {
+  $exporters = &drupal_static(__FUNCTION__, array());
+  if (empty($exporters)) {
+    if ($cache = cache_get('loft_data_grids:exporters', 'cache')) {
+     $exporters = empty($cache->data) ? NULL : $cache->data;
+    }
+    else {
+     // Set the default values
+     $exporters = array();
+     $cache = (object) array('data' => array());
+    }
+    if (empty($exporters)) {
+      $info = loft_data_grids_export_info();
+      $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
+      foreach ($possible as $path => $data) {
+        require_once $path;
+        $class = loft_data_grids_ns($data->name);
+        if (in_array(loft_data_grids_ns('ExporterInterface'), class_implements($class))) {
+          $class = new ReflectionClass($class);
+          if (!$class->isAbstract()) {
+            $exporters[] = $data->name;
+          }
+        }
+      }
+      
+      cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
+    }
+  }
+  
+  return $exporters;
+}
+
+
+
+/**
+ * Return an array of exporters info
+ *
+ * @param  bool $check_access (Optional, defaults to FALSE) Should the current
+ * users permission be applied against all exporters?
+ *
+ * @return array
+ *   Keyed by classname (not fully qualified with ns use loft_data_grids_ns())
+ */
+function loft_data_grids_export_info($check_access = FALSE) {
+  $info = &drupal_static(__FUNCTION__, array());
+  if (empty($info)) {
+    $data = loft_data_grids_ns('ExportData');
+    $data = new $data;
+    $classnames = _loft_data_grids_get_exporter_names();
+    $classes = array();
+    foreach ($classnames as $classname) {
+      $object = loft_data_grids_exporter($data, $classname);
+      $info[$classname] = array(
+        'id' => $classname,
+      ) + $object->getInfo();
+    }
+    drupal_alter('loft_data_grids_export_info', $info);      
+  }
+
+  if ($check_access) {
+    foreach ($info as $key => $data) {
+      if (!user_access('loft_data_grids:' . $data['id'])) {
+        unset($info[$key]);
+      }
+    }
+  }
+
+  return $info;
+}
+
+function loft_data_grids_exporter_options($check_access = TRUE, $include_descriptions = TRUE) {
+  $options = &drupal_static(__FUNCTION__, array());
+  if (empty($options)) {
+    foreach (loft_data_grids_export_info($check_access) as $data) {
+      $label = '';
+      $label .= '<strong>' . check_plain(isset($data['shortname']) ? $data['shortname'] : $data['name']) . '</strong>';
+      $label .= ' (' . check_plain($data['extension']) . ')';
+      if ($include_descriptions) {
+        $label .= ' ' . $data['description'];
+      }
+      $options[$data['id']] = $label;
+    }
+  }
+
+  return $options;
+}
+
+
+/**
+ * Create a fully-qualified ns from classnmae
+ *
+ * @param  string $classname
+ *
+ * @return  string
+ */
+function loft_data_grids_ns($classname) {
+  $classname = trim($classname, '\\');
+  $ns = 'AKlump\LoftDataGrids\\';
+  if (strpos($classname, $ns) !== 0) {
+    $classname = $ns . $classname;
+  }
+
+  return $classname;
 }
 
 /**
@@ -274,11 +177,10 @@ function loft_data_grids_export_info() {
  * @param mixed $page_id
  *   (Optional) Defaults to 0.
  */
-function loft_data_grids_export_data($page_id = 0, $class = 'ExportData') {
-  libraries_load('loft_data_grids');
-
-  if (class_exists($class)) {
-    return new $class($page_id);
+function loft_data_grids_export_data($page_id = 0, $classname = 'ExportData') {
+  $classname = loft_data_grids_ns($classname);
+  if (class_exists($classname)) {
+    return new $classname($page_id);
   }
 
   return FALSE;
@@ -288,29 +190,35 @@ function loft_data_grids_export_data($page_id = 0, $class = 'ExportData') {
  * Instantiate a new ExportData object
  *
  * This wrapper should be used for compatability issues with multiple library
-   locations such as PHPExcel
+ * locations such as PHPExcel
  *
  * @param ExportDataInterface $data
- * @param string $class
+ * @param string $classname
  *   The name of any of the various Exporter classes
  * @param string $filename
  *   (Optional) Defaults to ''.
  */
-function loft_data_grids_exporter(ExportDataInterface $data, $class, $filename = '') {
-  libraries_load('loft_data_grids');
-
-  if (class_exists($class)) {
-    $object = new $class($data, $filename);
-
-    // Support for PHPExcel through the drupal module rather than
-    // loft_data_grids vendor directory
-    if (!$object->dependencies
-        && $class === 'XLSXExporter'
-        && module_exists('phpexcel')) {
-      libraries_load('PHPExcel');
-    }
+function loft_data_grids_exporter(AKlump\LoftDataGrids\ExportDataInterface $data, $classname, $filename = '') {
+  $classname = loft_data_grids_ns($classname);
+  if (class_exists($classname)) {
+    $object = new $classname($data, $filename);
 
     return $object;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Instantiate a new Formatter object
+ *
+ * @param mixed $text
+ * @param string $classname Name of the formatter
+ */
+function loft_data_grids_formatter($text, $classname) {
+  $classname = loft_data_grids_ns($classname);
+  if (class_exists($classname)) {
+    return new $classname($page_id);
   }
 
   return FALSE;
