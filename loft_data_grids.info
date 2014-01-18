@@ -1,6 +1,6 @@
 name = "Loft Data Grids"
 description = "Integrates Loft Data Grids with Drupal"
-version = 7.x-2.0-rc3
+version = 7.x-2.0-rc4
 author = Aaron Klump <sourcecode@intheloftstudios.com>
 package = Other
 core = 7.x
