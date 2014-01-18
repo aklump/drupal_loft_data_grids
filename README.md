@@ -19,6 +19,7 @@ We have now included the dependencies in the distribution of this module, rather
 The 2.x branch no longer uses the [Libraries API](https://drupal.org/project/libraries) but instead uses [Composer Autoload](https://drupal.org/project/composer_autoload).  Take the following steps when upgrading to the 2.x branch:
 
 ### Required
+1. Update the module to the 2.x version.
 1. Download and install [Composer Autoload](https://drupal.org/project/composer_autoload).
 1. Delete the folder `libraries/loft_data_grids` and all it's contents.
 

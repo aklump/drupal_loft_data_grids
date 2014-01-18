@@ -42,12 +42,12 @@ function loft_data_grids_info() {
   if (empty($info)) {
     $info = array(
       'path' => drupal_get_path('module', 'loft_data_grids') . '/vendor/aklump/loft_data_grids', 
+      'loaded' => class_exists(loft_data_grids_ns('Exporter')), 
     );
 
     $info_file = $info['path'] . '/loft_data_grids.info';
-    if (($info['loaded'] = file_exists($info_file))
+    if (($info['installed'] = file_exists($info_file))
       && ($parsed = parse_ini_file($info_file))) {
-      $parsed['installed'] = TRUE;
       $info += $parsed;
     }
 
@@ -78,20 +78,29 @@ function _loft_data_grids_get_exporter_names() {
      $cache = (object) array('data' => array());
     }
     if (empty($exporters)) {
-      $info = loft_data_grids_export_info();
-      $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
-      foreach ($possible as $path => $data) {
-        require_once $path;
-        $class = loft_data_grids_ns($data->name);
-        if (in_array(loft_data_grids_ns('ExporterInterface'), class_implements($class))) {
-          $class = new ReflectionClass($class);
-          if (!$class->isAbstract()) {
-            $exporters[] = $data->name;
+      $info = loft_data_grids_info();
+
+      // This is a protection against fatal errors when we include the $path.
+      // This could happen on an upgrade from 1.x to 2.x if composer_autoload
+      // is not yet enabled
+      if ($info['loaded']) {
+        $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
+        foreach ($possible as $path => $data) {
+          include_once $path;     
+          $class = loft_data_grids_ns($data->name);
+          if (in_array(loft_data_grids_ns('ExporterInterface'), class_implements($class))) {
+            $class = new \ReflectionClass($class);
+            if (!$class->isAbstract()) {
+              $exporters[] = $data->name;
+            }
           }
         }
+        
+        cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
       }
-      
-      cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
+      else {
+        watchdog('loft_data_grids', 'Dependencies not found! Is composer_autoload enabled?', array(), WATCHDOG_ERROR);
+      }
     }
   }
   
@@ -112,8 +121,7 @@ function _loft_data_grids_get_exporter_names() {
 function loft_data_grids_export_info($check_access = FALSE) {
   $info = &drupal_static(__FUNCTION__, array());
   if (empty($info)) {
-    $data = loft_data_grids_ns('ExportData');
-    $data = new $data;
+    $data = loft_data_grids_export_data();
     $classnames = _loft_data_grids_get_exporter_names();
     $classes = array();
     foreach ($classnames as $classname) {

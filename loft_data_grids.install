@@ -19,35 +19,24 @@
 function loft_data_grids_requirements($phase) {
   $reqs = array();
   $t = get_t();
-
-  $info = loft_data_grids_info();
-
-  if ($phase === 'update' && empty($info['loaded'])) {
+  if ($phase == 'runtime') {
+    $info = loft_data_grids_info();
     $reqs['loft_data_grids'] = array(
       'title' => $info['name'],
-      'value' => l('Not Found!', $info['homepage']),
-      'description' => $t('The Loft Data Grids dependencies are missing; see README for installation instructions.'),
-      'severity' => REQUIREMENT_ERROR,
-    );
-  }
-  elseif ($phase == 'runtime') {
-    $reqs['loft_data_grids'] = array(
-      'title' => $info['name'],
-      'value' => l($info['version'], $info['homepage']),
-
-      // 'description' => $t('Successfully loaded dependencies from %path.', array(
-      //   '%path' => $info['path'],
-      // )),
+      'value' => isset($info['homepage']) ? l($info['version'], $info['homepage']) : $info['version'],
       'severity' => REQUIREMENT_OK,
     );
     if (empty($info['installed'])) {
-      $reqs['loft_data_grids']['value'] = l('Not Found!', $info['homepage']);
+      $reqs['loft_data_grids']['value'] = isset($info['homepage']) ? l('Not found!', $info['homepage']) : 'Not found!';
       $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids dependencies are missing; see README for installation instructions.');
       $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
     }
     elseif (empty($info['loaded'])) {
-      $reqs['loft_data_grids']['value'] = l('Not Loaded!', $info['homepage']);
+      $reqs['loft_data_grids']['value'] = isset($info['homepage']) ? l('Not loaded!', $info['homepage']) : 'Not loaded!';
       $reqs['loft_data_grids']['description'] = $t('The Loft Data Grids dependencies were found but not loaded; see README for installation instructions.');
+      if (!module_exists('composer_autoload')) {
+        $reqs['loft_data_grids']['description'] = $t('Enable composer_autoload immediately!');
+      }
       $reqs['loft_data_grids']['severity'] = REQUIREMENT_ERROR;
     }
   }
