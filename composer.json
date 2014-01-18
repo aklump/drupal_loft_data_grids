@@ -1,5 +1,5 @@
 {
   "require": {
-    "aklump/loft_data_grids": ">=0.4.2"
+    "aklump/loft_data_grids": ">=0.4.3"
   }
 }

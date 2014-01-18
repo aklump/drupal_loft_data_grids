@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "81881ece62986c199e2353bd145a725b",
+    "hash": "5d2783967a56ee56fe7add90dec31722",
     "packages": [
         {
             "name": "aklump/loft_data_grids",
-            "version": "0.4.2",
+            "version": "0.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aklump/loft_data_grids.git",
-                "reference": "10ef954e7bd4449903310cdeb441337c946f72dc"
+                "reference": "5d6c137b7a624f36e5be62de21f8f6cc6bf6742a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/10ef954e7bd4449903310cdeb441337c946f72dc",
-                "reference": "10ef954e7bd4449903310cdeb441337c946f72dc",
+                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/5d6c137b7a624f36e5be62de21f8f6cc6bf6742a",
+                "reference": "5d6c137b7a624f36e5be62de21f8f6cc6bf6742a",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "export",
                 "spreadsheet"
             ],
-            "time": "2014-01-18 17:28:04"
+            "time": "2014-01-18 20:51:25"
         },
         {
             "name": "phpoffice/phpexcel",
