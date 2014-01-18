@@ -118,8 +118,7 @@ function _loft_data_grids_get_exporter_names() {
  */
 function loft_data_grids_export_info($check_access = FALSE) {
   $info = &drupal_static(__FUNCTION__, array());
-  if (empty($info)) {
-    $data = loft_data_grids_export_data();
+  if (empty($info) && ($data = loft_data_grids_export_data())) {
     $classnames = _loft_data_grids_get_exporter_names();
     $classes = array();
     foreach ($classnames as $classname) {
