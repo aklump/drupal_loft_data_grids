@@ -107,8 +107,6 @@ function _loft_data_grids_get_exporter_names() {
   return $exporters;
 }
 
-
-
 /**
  * Return an array of exporters info
  *
@@ -144,13 +142,25 @@ function loft_data_grids_export_info($check_access = FALSE) {
   return $info;
 }
 
-function loft_data_grids_exporter_options($check_access = TRUE, $include_descriptions = TRUE) {
+/**
+ * Return an array suitable for form options keyed by classname
+ *
+ * @param  boolean $check_access         Check permissions
+ * @param  boolean $include_descriptions Include the description in the label
+ * @param  boolean $use_shortname        Use shortname over name for label
+ *
+ * @return array                         Keys are classnames, values are human
+ *   options.
+ */
+function loft_data_grids_exporter_options($check_access = TRUE, $include_descriptions = TRUE, $use_shortname = TRUE) {
   $options = &drupal_static(__FUNCTION__, array());
   if (empty($options)) {
     foreach (loft_data_grids_export_info($check_access) as $data) {
+
+      // Do not include html it will break for select lists
       $label = '';
-      $label .= '<strong>' . check_plain(isset($data['shortname']) ? $data['shortname'] : $data['name']) . '</strong>';
-      $label .= ' (' . check_plain($data['extension']) . ')';
+      $label .= $use_shortname && isset($data['shortname']) ? $data['shortname'] : $data['name'];
+      $label .= ' (' . $data['extension'] . ')';
       if ($include_descriptions) {
         $label .= ' ' . $data['description'];
       }
