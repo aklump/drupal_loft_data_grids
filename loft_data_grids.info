@@ -4,5 +4,6 @@ version = 7.x-2.0-rc6
 author = Aaron Klump <sourcecode@intheloftstudios.com>
 package = Other
 core = 7.x
+homepage = http://www.intheloftstudios.com/packages/php/drupal_loft_data_grids
 
 dependencies[] = composer_autoload
