@@ -43,3 +43,15 @@ function loft_data_grids_requirements($phase) {
   
   return $reqs;
 }
+
+/**
+ * Reminder to enable Composer Autoload
+ */
+function loft_data_grids_update_7001(&$sandbox) {
+  $output = array();
+  if (!module_exists('composer_autoload')) {
+    $output[] = st('You must enabled the <a href="!url">Composer Autoload</a> module immediately. See README for more info.', array('!url' => url('https://drupal.org/project/composer_autoload')));
+  }
+  
+  return implode("<br />", $output);
+}
