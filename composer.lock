@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "aklump/loft_data_grids",
-            "version": "0.4.3",
+            "version": "0.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aklump/loft_data_grids.git",
-                "reference": "5d6c137b7a624f36e5be62de21f8f6cc6bf6742a"
+                "reference": "9b29006c44fb243cbfb1f62023380a19b4203914"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/5d6c137b7a624f36e5be62de21f8f6cc6bf6742a",
-                "reference": "5d6c137b7a624f36e5be62de21f8f6cc6bf6742a",
+                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/9b29006c44fb243cbfb1f62023380a19b4203914",
+                "reference": "9b29006c44fb243cbfb1f62023380a19b4203914",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "export",
                 "spreadsheet"
             ],
-            "time": "2014-01-18 20:51:25"
+            "time": "2014-01-22 23:47:29"
         },
         {
             "name": "phpoffice/phpexcel",
