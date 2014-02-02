@@ -86,8 +86,10 @@ function _loft_data_grids_get_exporter_names() {
       if ($info['loaded']) {
         $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
         foreach ($possible as $path => $data) {
-          include_once $path;     
           $class = loft_data_grids_ns($data->name);
+          if (!class_exists($class) && !interface_exists($class)) {
+            include_once $path;
+          }
           if (in_array(loft_data_grids_ns('ExporterInterface'), class_implements($class))) {
             $class = new \ReflectionClass($class);
             if (!$class->isAbstract()) {
