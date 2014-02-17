@@ -16,11 +16,10 @@ These permissions can be used globally to remove certain exporters from the UI f
 ## Upgrade to 2.x
 We have now included the dependencies in the distribution of this module, rather than requiring that [Composer](http://getcomposer.org) be installed on your system to install this module.  This decision was made in an effort to make this a more "turn-key" solution for users not familiar yet with [Composer](http://getcomposer.org).
 
-The 2.x branch no longer uses the [Libraries API](https://drupal.org/project/libraries) but instead uses [Composer Autoload](https://drupal.org/project/composer_autoload).  Take the following steps when upgrading to the 2.x branch:
+The 2.x branch no longer uses the [Libraries API](https://drupal.org/project/libraries).
 
 ### Required
 1. Update the module to the 2.x version.
-1. Download and install [Composer Autoload](https://drupal.org/project/composer_autoload).
 1. Delete the folder `libraries/loft_data_grids` and all it's contents.
 
 ### Optional

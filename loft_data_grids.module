@@ -8,6 +8,13 @@
  */
 
 /**
+ * Implements hook_init().
+ */
+function loft_data_grids_init() {
+  require_once drupal_get_path('module', 'loft_data_grids') . '/vendor/autoload.php';
+}
+
+/**
  * Implements hook_permission().
  */
 function loft_data_grids_permission() {
@@ -81,8 +88,7 @@ function _loft_data_grids_get_exporter_names() {
       $info = loft_data_grids_info();
 
       // This is a protection against fatal errors when we include the $path.
-      // This could happen on an upgrade from 1.x to 2.x if composer_autoload
-      // is not yet enabled
+      // This could happen on an upgrade from 1.x to 2.x
       if ($info['loaded']) {
         $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
         foreach ($possible as $path => $data) {
@@ -99,9 +105,6 @@ function _loft_data_grids_get_exporter_names() {
         }
         
         cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
-      }
-      else {
-        watchdog('loft_data_grids', 'Dependencies not found! Is composer_autoload enabled?', array(), WATCHDOG_ERROR);
       }
     }
   }
