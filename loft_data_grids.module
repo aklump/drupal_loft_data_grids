@@ -6,6 +6,7 @@
  * @defgroup loft_data_grids Loft Data Grids
  * @{
  */
+use AKlump\LoftDataGrids\ExportDataInterface;
 
 /**
  * Implements hook_init().
@@ -220,7 +221,7 @@ function loft_data_grids_export_data($page_id = 0, $classname = 'ExportData') {
  * @param string $filename
  *   (Optional) Defaults to ''.
  */
-function loft_data_grids_exporter(AKlump\LoftDataGrids\ExportDataInterface $data, $classname, $filename = '') {
+function loft_data_grids_exporter(ExportDataInterface $data, $classname, $filename = '') {
   $classname = loft_data_grids_ns($classname);
   if (class_exists($classname)) {
     $object = new $classname($data, $filename);
