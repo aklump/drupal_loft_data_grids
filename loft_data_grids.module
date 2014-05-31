@@ -13,18 +13,16 @@ use AKlump\LoftDataGrids\ExportDataInterface;
  */
 function loft_data_grids_init() {
   require_once drupal_get_path('module', 'loft_data_grids') . '/vendor/autoload.php';
+  module_load_include('php', 'loft_data_grids', 'includes/DrupalTableExporter');
 }
 
 /**
- * Implements hook_permission().
+ * Implements hook_perm().
  */
-function loft_data_grids_permission() {
+function loft_data_grids_perm() {
   $perms = array();
   foreach (loft_data_grids_export_info() as $data) {
-    $perms['loft_data_grids:' . $data['id']] = array(
-     'title' => t('Visible in UI: @id', array('@id' => $data['name'])),
-     'description' => check_plain($data['description']),
-    );
+    $perms[] = 'loft_data_grids:' . $data['id'];
   }
 
   return $perms;
@@ -46,7 +44,7 @@ function loft_data_grids_permission() {
  *   - installed
  */
 function loft_data_grids_info() {
-  $info = &drupal_static(__FUNCTION__, array());
+  static $info = array();
   if (empty($info)) {
     $info = array(
       'path' => drupal_get_path('module', 'loft_data_grids') . '/vendor/aklump/loft_data_grids', 
@@ -75,7 +73,7 @@ function loft_data_grids_info() {
  * @return array
  */
 function _loft_data_grids_get_exporter_names() {
-  $exporters = &drupal_static(__FUNCTION__, array());
+  static $exporters = array();
   if (empty($exporters)) {
     if ($cache = cache_get('loft_data_grids:exporters', 'cache')) {
      $exporters = empty($cache->data) ? NULL : $cache->data;
@@ -91,7 +89,7 @@ function _loft_data_grids_get_exporter_names() {
       // This is a protection against fatal errors when we include the $path.
       // This could happen on an upgrade from 1.x to 2.x
       if ($info['loaded']) {
-        $possible = file_scan_directory($info['path'] . '/src', '/\.php$/');
+        $possible = file_scan_directory($info['path'] . '/src', '\.php$');
         foreach ($possible as $path => $data) {
           $class = loft_data_grids_ns($data->name);
           if (!class_exists($class) && !interface_exists($class)) {
@@ -104,6 +102,9 @@ function _loft_data_grids_get_exporter_names() {
             }
           }
         }
+
+        // Formatters added by our module.
+        $exporters[] = 'DrupalTableExporter';
         
         cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
       }
@@ -123,7 +124,7 @@ function _loft_data_grids_get_exporter_names() {
  *   Keyed by classname (not fully qualified with ns use loft_data_grids_ns())
  */
 function loft_data_grids_export_info($check_access = FALSE) {
-  $info = &drupal_static(__FUNCTION__, array());
+  static $info = array();
   if (empty($info) && ($data = loft_data_grids_export_data())) {
     $classnames = _loft_data_grids_get_exporter_names();
     $classes = array();
@@ -158,7 +159,7 @@ function loft_data_grids_export_info($check_access = FALSE) {
  *   options.
  */
 function loft_data_grids_exporter_options($check_access = TRUE, $include_descriptions = TRUE, $use_shortname = TRUE) {
-  $options = &drupal_static(__FUNCTION__, array());
+  static $options = array();
   if (empty($options)) {
     foreach (loft_data_grids_export_info($check_access) as $data) {
 
