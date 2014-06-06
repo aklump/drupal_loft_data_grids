@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "aklump/loft_data_grids",
-            "version": "0.4.7",
+            "version": "0.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aklump/loft_data_grids.git",
-                "reference": "7b17b35ebfbfdc3b8b9bc7938a9f38181b8f3c39"
+                "reference": "d2d530b934b24916b18ff9d7a461b8b6cb1567cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/7b17b35ebfbfdc3b8b9bc7938a9f38181b8f3c39",
-                "reference": "7b17b35ebfbfdc3b8b9bc7938a9f38181b8f3c39",
+                "url": "https://api.github.com/repos/aklump/loft_data_grids/zipball/d2d530b934b24916b18ff9d7a461b8b6cb1567cd",
+                "reference": "d2d530b934b24916b18ff9d7a461b8b6cb1567cd",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "export",
                 "spreadsheet"
             ],
-            "time": "2014-05-03 20:13:58"
+            "time": "2014-06-06 18:48:56"
         },
         {
             "name": "phpoffice/phpexcel",
@@ -113,7 +113,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.3.15",
+            "version": "v2.3.16",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
