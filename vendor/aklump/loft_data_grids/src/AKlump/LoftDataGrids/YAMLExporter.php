@@ -8,9 +8,9 @@ use Symfony\Component\Yaml\Yaml;
  * http://symfony.com/doc/current/components/yaml/introduction.html
  */
 class YAMLExporter extends Exporter implements ExporterInterface {
-  protected $extension = '.yaml';
+  protected $extension = '.yml';
 
-  public function __construct(ExportDataInterface $data, $filename = '') {
+  public function __construct(ExportDataInterface $data = NULL, $filename = '') {
     parent::__construct($data, $filename);
   }
 
@@ -27,9 +27,10 @@ class YAMLExporter extends Exporter implements ExporterInterface {
 
   public function compile($page_id = NULL) {
     $pages = $this->getData()->get();
-    if ($page_id && array_key_exists($page_id, $pages)) {
-      $pages = array($pages[$page_id]);
+    if (isset($page_id) && array_key_exists($page_id, $pages)) {
+      $pages = $pages[$page_id];
     }
     $this->output = Yaml::dump($pages);
   }
+
 }

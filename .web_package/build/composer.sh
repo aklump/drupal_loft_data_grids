@@ -1,0 +1,1 @@
+cd $7 && /Volumes/Data/Users/aklump/bin/composer update

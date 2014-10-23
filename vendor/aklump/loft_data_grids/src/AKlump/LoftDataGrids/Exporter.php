@@ -9,6 +9,10 @@ abstract class Exporter implements ExporterInterface {
   protected $export_data, $title, $filename, $extension, $output;
   protected $header = array();
 
+  protected $data = array(
+    'showPageIds' => TRUE,
+  );
+  
   /**
    * Constructor
    *
@@ -16,8 +20,10 @@ abstract class Exporter implements ExporterInterface {
    * @param string $filename
    *   (Optional) Defaults to ''.
    */
-  public function __construct(ExportDataInterface $data, $filename = '') {
-    $this->setData($data);
+  public function __construct(ExportDataInterface $data = NULL, $filename = '') {
+    if (isset($data)) {
+      $this->setData($data);
+    }
     $this->setFilename($filename);
   }
 
@@ -227,4 +233,27 @@ abstract class Exporter implements ExporterInterface {
     print $this->output;
     exit();
   }
+
+  public function showPageIds() {
+    $this->data['showPageIds'] = TRUE;
+  
+    return $this;
+  }
+  
+  public function hidePageIds() {
+    $this->data['showPageIds'] = FALSE;
+  
+    return $this;
+  }
+
+  public function getShowPageIds() {
+    return $this->data['showPageIds'];
+  }
+
+  protected function cssSafe($string) {
+    $string = preg_replace('/[^a-z0-9\-\.]/', '-', strtolower($string));
+    $string = preg_replace('/^\d/', 'c-\0', $string);
+    
+    return preg_replace('/-{2,}/', '-', $string);    
+  }  
 }

@@ -22,6 +22,8 @@ See the code for more documentation.
 
 ## Example Usage
 
+### Building a data object
+
 In this example we'll build a 2 paged model, the first page contains two columns (names and ages) of three people.  The second page will contain two rows of vehicle information (color and make).
 
     $obj = new ExportData();
@@ -31,11 +33,22 @@ In this example we'll build a 2 paged model, the first page contains two columns
     $obj->add('Name', 'Hillary')->add('Age', 37)->next();
     $obj->add('Name', 'Maia')->add('Age', 7)->next();
 
-    // Swite to page 1; we'll be placed on row 0 when the new page is created.
+    // Switch to page 1; we'll be placed on row 0 when the new page is created.
     $obj->setPage(1);
     $obj->add('Color', 'Black')->add('Make', 'Subaru')->next();
     $obj->add('Color', 'White')->add('Make', 'Hyundai')->next();
+
+### Accessing data from the object
+
+    $obj->setPage(0)->setPointer(0)->getValue('Name') === 'Aaron'
+    $obj->getValue('Name') === 'Aaron'
+    $obj->setPointer(2)->getValue('Name') === 'Maia'
+    $obj->setPointer(0)->get() === array('Name' => 'Aaron', 'Age' => 39)
+
+    $obj->setPage(1)->setPointer(1)->getValue('Color') === 'White'
  
+### Exporting data to other formats
+
 And now to get that as a CSV file we do...
 
     $exporter = new CSVExporter($obj);

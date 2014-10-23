@@ -13,6 +13,7 @@ use AKlump\LoftDataGrids\ExportDataInterface;
  */
 function loft_data_grids_init() {
   require_once drupal_get_path('module', 'loft_data_grids') . '/vendor/autoload.php';
+  module_load_include('php', 'loft_data_grids', 'includes/DrupalTableExporter');
 }
 
 /**
@@ -104,6 +105,9 @@ function _loft_data_grids_get_exporter_names() {
             }
           }
         }
+
+        // Formatters added by our module.
+        $exporters[] = 'DrupalTableExporter';        
         
         cache_set('loft_data_grids:exporters', $exporters, 'cache', CACHE_PERMANENT);
       }
@@ -223,13 +227,14 @@ function loft_data_grids_export_data($page_id = 0, $classname = 'ExportData') {
  */
 function loft_data_grids_exporter(ExportDataInterface $data, $classname, $filename = '') {
   $classname = loft_data_grids_ns($classname);
-  if (class_exists($classname)) {
+  $object = FALSE;
+  try {
     $object = new $classname($data, $filename);
-
-    return $object;
+  } catch (Exception $e) {
+    watchdog_exception('loft_data_grids', $e);
   }
 
-  return FALSE;
+  return $object;
 }
 
 /**

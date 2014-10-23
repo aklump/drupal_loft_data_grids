@@ -99,13 +99,13 @@ table {
       $this->format->left = '<td>';
       $this->format->right = '</td>';
       $this->output .= '<tbody>' . $this->format->cr;
-      foreach ($data as $row) {
-        $this->output .= $this->collapseRow($row);
+      foreach ($data as $column => $row) {
+        $this->output .= $this->collapseRow($row, $column);
       }
       $this->output .= '</tbody>' . $this->format->cr;
 
       $page_title = '';
-      if (count($pages) > 1) {
+      if (count($pages) > 1 && $this->getShowPageIds()) {
         $page_title = '<caption>' . $page_id . '</caption>';
       }
       $tables[] = '<table>' . $page_title . $this->format->cr . $this->output . '</table>' . $this->format->cr;
@@ -120,5 +120,12 @@ table {
       $this->output = str_replace('<body></body>', '<body>' . $snippet . '</body>', $this->output);
       $this->output = str_replace('<title></title>', '<title>' . $this->title . '</title>', $this->output);
     }
+  }
+
+  protected function collapseCell($cell, $column) {
+    // We will add a class to this td based on the column label.
+    $this->format->left = '<td class="' . $this->cssSafe('colgroup-' . $column) . '">';
+
+    return parent::collapseCell($cell, $column);
   }
 }

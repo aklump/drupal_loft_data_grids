@@ -62,6 +62,33 @@ interface ExportDataInterface {
   public function getKeys($page_id = NULL);
 
   /**
+   * Disables one or more keys on the current page from get().
+   *
+   * @param  bool||string  Any number of arguments, which are keys to hide
+   * from self::get().  The data remains in tact, it just will not be output 
+   * in the getters.
+   * Send FALSE to clear out any previously hidden keys.  Send TRUE and all
+   * keys for the current page will be hidden.
+   * This method takes the current page in to account; so it only hides
+   * the keys on the current page.
+   *
+   * @return $this
+   */
+  public function hideKeys();
+
+  /**
+   * Inverse of hideKeys.
+   *
+   * To hide all but one column (key) you would do this:
+   * @code
+   *   $obj->hideKeys(TRUE)->showKeys('Column1')->getPage();
+   * @endcode
+   *
+   * @return [type] [description]
+   */
+  public function showKeys();
+  
+  /**
    * Add (or Set) data to the current record
    *
    * @param string $key
@@ -146,6 +173,36 @@ interface ExportDataInterface {
   public function getCurrent($key = NULL);
 
   /**
+   * Return the value of a single column, single row by key.
+   *
+   * Note this is identical to self::getCurrent($key) however more intuitively
+   * named, so it makes more sense.
+   *
+   * @param  string $key
+   *
+   * @return mixed
+   */
+  public function getValue($key);
+
+  /**
+   * Returns the row count of the current page.
+   *
+   * @return int
+   */
+  public function getCount();
+
+  /**
+   * Returns all rows of the current page keyed by pointer.
+   *
+   * Note this is functionally the same as self::getPage($current_page),
+   * however, it doesn't require knowning the page id and it is more
+   * intuitively named.
+   *
+   * @return array
+   */
+  public function getRows();
+
+  /**
    * Get the current page id
    *
    * @return mixed
@@ -155,20 +212,20 @@ interface ExportDataInterface {
   /**
    * Return a single page of data
    *
-   * @param mixed $page_id
+   * @param mixed $page_id Optional, ommitted the current page will be used.
    *
    * @return array
    */
-  public function getPage($page_id);
+  public function getPage($page_id = NULL);
 
   /**
    * Return a single page as an ExportData object
    *
-   * @param  mixed $page_id
+   * @param mixed $page_id Optional, ommitted the current page will be used.
    *
    * @return ExportDataInterface
    */
-  public function getPageData($page_id);
+  public function getPageData($page_id = NULL);
 
   /**
    * Delete a single page from the object
